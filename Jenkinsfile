@@ -1,77 +1,44 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    // Nombre de imagen a crear
-    IMAGE_NAME = "miapp"
-    IMAGE_TAG  = "latest"
-    // Credencial ID para GitHub (si la necesitas en el pipeline)
-    GITHUB_TOKEN = credentials('github-token')
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    tools {
+        maven 'Maven-3.9.11'   //usa EXACTAMENTE el nombre que pusiste en Jenkins → Global Tools
     }
 
-    stage('Prepare') {
-      steps {
-        echo "Workspace: ${env.WORKSPACE}"
-        sh 'ls -la || true'
-      }
-    }
+    stages {
 
-    stage('Build (Maven)') {
-      steps {
-        // Si Jenkins tiene Maven configurado como tool, usa tool('maven-3.9') con sh "${MVN_HOME}/bin/mvn"
-        // Aquí usamos el contenedor de maven si lo prefieres localmente -> pero este ejemplo usa comando mvn
-        sh 'mvn -B -DskipTests=false clean package'
-      }
-      post {
-        success { archiveArtifacts artifacts: 'target/*.jar', fingerprint: true }
-      }
-    }
-
-    stage('Unit tests') {
-      steps {
-        sh 'mvn test'
-      }
-      post {
-        always {
-          junit 'target/surefire-reports/*.xml'
+        stage('Clonar repositorio') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/prvgal/DevOps-Pipeline.git'
+            }
         }
-      }
+
+        stage('Compilar') {
+            steps {
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+
+        stage('Ejecutar tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Empaquetar') {
+            steps {
+                sh 'mvn package'
+            }
+        }
     }
 
-    stage('Docker Build') {
-      steps {
-        // Requiere que Jenkins tenga acceso a docker (mount /var/run/docker.sock)
-        sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-      }
+    post {
+        success {
+            echo "Pipeline completado exitosamente"
+        }
+        failure {
+            echo "❌ Pipeline falló"
+        }
     }
-
-    stage('Docker Run') {
-      steps {
-        // Para evitar colisiones, parámetro --rm y nombre único
-        sh "docker rm -f ${IMAGE_NAME} || true"
-        sh "docker run -d --name ${IMAGE_NAME} -p 8081:8080 ${IMAGE_NAME}:${IMAGE_TAG}"
-      }
-    }
-
-  }
-
-  post {
-    success {
-      echo "Pipeline finalizado con éxito"
-    }
-    failure {
-      echo "Pipeline FALLIDO"
-    }
-    always {
-      // Limpieza opcional
-      sh "docker images | head -n 5 || true"
-    }
-  }
 }
