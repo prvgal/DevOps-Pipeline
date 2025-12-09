@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven-3.9.11'   //usa EXACTAMENTE el nombre que pusiste en Jenkins → Global Tools
+        maven 'Maven-3.9.11'  
     }
 
     stages {
@@ -14,39 +14,34 @@ pipeline {
             }
         }
 
-         stage('Construir (Build)') {
+        stage('Construir (Build)') {
             steps {
                 echo 'Compilando el proyecto...'
-                sh 'mvn clean compile'
+                sh "mvn -B clean compile"
             }
         }
 
         stage('Ejecutar tests') {
             steps {
-                echo 'Ejecutando pruebas unitarias de la Iteración 1...'
-                sh 'mvn test'
+                echo 'Ejecutando pruebas unitarias...'
+                sh "mvn -B test"
             }
         }
 
         stage('Empaquetar') {
             steps {
-                echo 'Generando archivo .jar...'
-                sh 'mvn package'
+                echo 'Generando archivo .jar...' 
+                sh "mvn -B package"
             }
         }
     }
 
     post {
         always {
-            // Recogemos los resultados de los tests para verlos en Jenkins
             junit 'target/surefire-reports/*.xml'
         }
         success {
-            echo '¡Iteración 1 completada con éxito!'
-            // Guardamos el jar generado como artefacto
             archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
         }
     }
 }
-
-
