@@ -13,7 +13,9 @@ public class Main {
             System.out.println("\n--- PROYECTO MATRIX (Iteración 1) ---");
             System.out.println("1. Sumar Matrices");
             System.out.println("2. Restar Matrices");
-            System.out.println("3. Salir");
+            System.out.println("3. Multiplicar Matrices");     // NUEVO
+            System.out.println("4. Producto Escalar (Matriz * n)"); // NUEVO
+            System.out.println("5. Salir");
             System.out.print("Elige una opción: ");
 
             int opcion = scanner.nextInt();
@@ -27,7 +29,15 @@ public class Main {
                     System.out.println("--- RESTA ---");
                     ejecutarOperacion("resta");
                     break;
-                case 3:
+                case 3: // NUEVO
+                    System.out.println("--- MULTIPLICACIÓN ---");
+                    ejecutarOperacion("multiplicacion");
+                    break;
+                case 4: // NUEVO
+                    System.out.println("--- PRODUCTO ESCALAR ---");
+                    ejecutarProductoEscalar();
+                    break;
+                case 5:
                     salir = true;
                     System.out.println("Saliendo...");
                     break;
@@ -66,6 +76,20 @@ public class Main {
             }
         }
         return matriz;
+    }
+
+    // Método específico para la Opción 4
+    private static void ejecutarProductoEscalar() {
+        System.out.println("Ingrese la Matriz:");
+        int[][] a = leerMatriz();
+        
+        System.out.print("Ingrese el número escalar (multiplicador): ");
+        int escalar = scanner.nextInt();
+
+        int[][] resultado = logica.productoEscalar(a, escalar);
+        
+        System.out.println("Resultado del Producto Escalar:");
+        logica.imprimirMatriz(resultado);
     }
     
 }
