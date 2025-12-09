@@ -14,12 +14,6 @@ pipeline {
             }
         }
 
-        stage('Construir (Build)') {
-            steps {
-                echo 'Compilando el proyecto...'
-                sh 'mvn clean compile'
-            }
-        }
 
         stage('Ejecutar tests') {
             steps {
@@ -48,3 +42,4 @@ pipeline {
         }
     }
 }
+
