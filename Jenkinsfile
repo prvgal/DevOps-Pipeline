@@ -14,31 +14,37 @@ pipeline {
             }
         }
 
-        stage('Compilar') {
+        stage('Construir (Build)') {
             steps {
-                sh 'mvn clean install -DskipTests'
+                echo 'Compilando el proyecto...'
+                sh 'mvn clean compile'
             }
         }
 
         stage('Ejecutar tests') {
             steps {
+                echo 'Ejecutando pruebas unitarias de la Iteración 1...'
                 sh 'mvn test'
             }
         }
 
         stage('Empaquetar') {
             steps {
+                echo 'Generando archivo .jar...'
                 sh 'mvn package'
             }
         }
     }
 
     post {
-        success {
-            echo "Pipeline completado exitosamente"
+        always {
+            // Recogemos los resultados de los tests para verlos en Jenkins
+            junit 'target/surefire-reports/*.xml'
         }
-        failure {
-            echo "❌ Pipeline falló"
+        success {
+            echo '¡Iteración 1 completada con éxito!'
+            // Guardamos el jar generado como artefacto
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
         }
     }
 }
