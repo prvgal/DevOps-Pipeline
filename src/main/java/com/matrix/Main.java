@@ -10,7 +10,7 @@ public class Main {
         boolean salir = false;
 
         while (!salir) {
-            System.out.println("\n--- PROYECTO MATRIX (Iteración 1) ---");
+            System.out.println("\n--- PROYECTO MATRIX ---");
             System.out.println("1. Sumar Matrices");
             System.out.println("2. Restar Matrices");
             System.out.println("3. Multiplicar Matrices");     // NUEVO
@@ -93,3 +93,4 @@ public class Main {
     }
     
 }
+
